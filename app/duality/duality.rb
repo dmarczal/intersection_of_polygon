@@ -17,7 +17,7 @@ class Duality
     a = point_a[1] - point_b[1]
     b = point_b[0] - point_a[0]
     c = point_a[0] * point_b[1] - point_b[0] * point_a[1] 
-    puts "#{a}x + #{b}y + #{c} = 0"
+    #puts "#{a}x + #{b}y + #{c} = 0"
 
     {:a => a.to_f, :b => b.to_f, :c => c.to_f}
   end

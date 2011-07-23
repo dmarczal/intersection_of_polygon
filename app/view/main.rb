@@ -12,67 +12,12 @@ class IntersectionFrame < Wx::Frame
 
   include FileReader
 
+  OPTION_SIZE = 166
+
   def initialize
     super(nil, :title=>"Intersecção de Polígonos Convexos", :size=>[700,500])
-    
-    @points = read
-    intersection
-    # Start creating the sashes - these are created from outermost
-    # inwards. 
-    sash = Wx::SashLayoutWindow.new(self, -1, Wx::DEFAULT_POSITION,
-                                    Wx::Size.new(166, self.get_size.y))
-
-    # The default width of the sash is 1750 pixels, and it extends the
-    # full height of the frame
-    sash.set_default_size( Wx::Size.new(166, self.get_size.y) )
-
-    # This sash splits the frame top to bottom
-    sash.set_orientation(Wx::LAYOUT_VERTICAL)
-
-    # Place the sash on the left of the frame
-    sash.set_alignment(Wx::LAYOUT_LEFT)
-    
-    # Show a drag bar on the right of the sash
-    sash.set_sash_visible(Wx::SASH_RIGHT, true)
-    sash.set_background_colour(Wx::Colour.new(225, 200, 200) )
-
-    panel = Wx::Panel.new(sash)
-    panel.set_background_colour(Wx::WHITE)
-    v_siz = Wx::StaticBoxSizer.new( Wx::VERTICAL, panel, 'Opções') 
-
-    types = ['Polígono A', 'Polígono B', 'Dual(A)', 'Dual(B)', 'Dual(A) U Dual(B)', 'F(Dual(A) U Dual(B))', 'Dual(F(Dual(A)UDual(B)))']
-    
-    my_font = Wx::Font.new
-    my_font.set_point_size(7)
-    my_font.set_family(Wx::FONTFAMILY_MODERN)
-    #my_font.set_style(Wx::FONTSTYLE_ITALIC) 
-    my_font.set_weight(Wx::FONTWEIGHT_BOLD)
-
-
-
-    types.each_with_index do |value, index|
-       p_a = Wx::CheckBox.new(panel, -1, value)
-       p_a.set_value(true)
-       p_a.set_foreground_colour(@polygon_panel.color(index))
-       p_a.set_font(my_font) 
-
-       evt_checkbox(p_a) do |event|
-          on_check_box(index)
-       end
-       v_siz.add(p_a, 0, Wx::ADJUST_MINSIZE)
-    end
-       
-    panel.set_sizer_and_fit(v_siz)
-    # handle the sash being dragged
-    evt_sash_dragged( sash.get_id ) { | e | on_v_sash_dragged(sash, e) }
-
-
-    evt_size { | e | on_size(e) }
-    Wx::LayoutAlgorithm.new.layout_frame(self, @polygon_panel)
-  end
-
-  def on_check_box(index)
-    @polygon_panel.show_or_not(index)
+    read_polygons_and_calculate
+    create_options        
   end
 
   def on_size(e)
@@ -101,8 +46,98 @@ class IntersectionFrame < Wx::Frame
     dual_fecho = Duality.new(fecho_convexo).duals_lines
      
     union_dual.each { |point| point.delete_at 2 }
+    
+     @polygon_panel = DrawPolygon.new(self, @points[1], @points[2],
+                                     dual_a, dual_b, union_dual,
+                                     fecho_convexo, dual_fecho )
+  end
+private
+  def create_options
+    # Start creating the sashes - these are created from outermost
+    # inwards. 
+    sash = Wx::SashLayoutWindow.new(self, -1, Wx::DEFAULT_POSITION,
+                                    Wx::Size.new(OPTION_SIZE, self.get_size.y))
 
-    @polygon_panel = DrawPolygon.new(self, @points[1], @points[2], dual_a, dual_b, union_dual, fecho_convexo, dual_fecho )
+    sash.set_default_size( Wx::Size.new(OPTION_SIZE, self.get_size.y) )
+
+    # This sash splits the frame top to bottom
+    sash.set_orientation(Wx::LAYOUT_VERTICAL)
+
+    # Place the sash on the left of the frame
+    sash.set_alignment(Wx::LAYOUT_LEFT)
+    
+    sash.set_sash_visible(Wx::SASH_RIGHT, true)
+    sash.set_background_colour(Wx::Colour.new(225, 200, 200))
+    
+    panel = Wx::Panel.new(sash)
+    panel.set_background_colour(Wx::WHITE)
+    v_siz = Wx::StaticBoxSizer.new( Wx::VERTICAL, panel, 'Opções') 
+
+    types = ['Polígono A', 'Polígono B', 'Dual(A)', 'Dual(B)',
+             'Dual(A) U Dual(B)', 'F(Dual(A) U Dual(B))', 'Dual(F(Dual(A)UDual(B)))']
+    
+    types.each_with_index do |value, index|
+       c = create_check_box(panel, value, index)
+       v_siz.add(c, 0, Wx::ADJUST_MINSIZE)
+    end
+
+    scale_text =  StaticText.new(panel, -1, " Scale Zoom: ")
+    v_siz.add(scale_text, 0, Wx::ADJUST_MINSIZE)
+
+    zoom_x = ["1", "2", "4", "6", "8", "10"]
+    ch = Wx::Choice.new(panel, -1, Wx::DEFAULT_POSITION, Wx::DEFAULT_SIZE, zoom_x)
+    v_siz.add(ch, 0, Wx::ADJUST_MINSIZE)
+
+    zoom_text =  StaticText.new(panel, -1, " Zoom: ")
+    v_siz.add(zoom_text, 0, Wx::ADJUST_MINSIZE)
+    
+    slider = Wx::Slider.new(panel, 100, 0, -100, 100, Wx::DEFAULT_POSITION, Wx::Size.new(150,-1),
+                            Wx::SL_VERTICAL | Wx::SL_AUTOTICKS | Wx::SL_LABELS)
+
+    slider.set_tick_freq(5,1)
+
+    v_siz.add(slider, 10, Wx::ADJUST_MINSIZE)
+    
+    evt_slider(slider) do |e|
+      @polygon_panel.zoom= slider.get_value * zoom_x[ch.get_selection].to_i
+      @polygon_panel.refresh
+    end
+
+    panel.set_sizer_and_fit(v_siz)
+    
+    evt_sash_dragged( sash.get_id ) { | e | on_v_sash_dragged(sash, e) }
+
+    evt_size { | e | on_size(e) }
+    Wx::LayoutAlgorithm.new.layout_frame(self, @polygon_panel)
+  end
+
+  def read_polygons_and_calculate
+    @points = read
+    intersection
+  end
+
+  def create_check_box(parent, value, index)
+    c = Wx::CheckBox.new(parent, -1, value)
+    c.set_value(true)
+    c.set_foreground_colour(@polygon_panel.color(index))
+    c.set_font(font) 
+
+    evt_checkbox(c) do |event|
+      on_check_box(index)
+    end
+    c
+  end
+
+  def font
+    f = Wx::Font.new
+    f.set_point_size(7)
+    f.set_family(Wx::FONTFAMILY_MODERN)
+    f.set_weight(Wx::FONTWEIGHT_BOLD)
+    f
+  end
+
+  def on_check_box(index)
+    @polygon_panel.show_or_not(index)
   end
 end
 

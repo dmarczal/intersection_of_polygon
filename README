@@ -1,0 +1,49 @@
+Aluno: Diego Marczal
+
+Segundo Trabalho de Tópicos em Algoritmos - Tópicos em Geometria Computacional
+
+Intersecção de polígonos pelo uso de dualidade e fecho convexo
+
+Problema: 
+Dado dois Polígonos Convexos, P com n vértices e Q com m vértices determinar 
+a intersecção dos dois polígonos. Como temos dois polígonos convexos, 
+a interseção do dos dois polígonos será outro polígono convexo.
+
+Para Determinar a intersecção dos polígonos o teorema visto na disciplina.
+Seja A e B dois polígonos, então:
+
+A ∩ B = D(F(D(A) U D(A)))
+
+Onde D() é a função que calcula o Dual de um polígono e
+F é a função que calcula o fecho convexo de uma conjunto de pontos
+
+Entrada:
+
+Um arquivo sendo a primeira linha é formada pelo número de vértices do primeiro polígono.
+Depois temos as coordenadas (inteiras) dos vértices do primeiro polígono. Em seguida o número
+de vértices do segundo polígono e depois as coordenadas dos vértices. 
+Em cada polígono os vértices estão em ordem anti-horária.
+
+Saída:
+
+A saída do algoritmo é visual onde apresenta-se separados por cores
+Polígono A -> Vermelho
+Polígono B -> Azul
+Dual de A  -> Marrom
+Dual de B  -> Azul escuro
+Dual(A) U Dual(B) -> Verde
+Fecho Convexo do Dual(A) U Dual(B) -> Cinza
+Dual do Fecho Convexo de Dual(A) U Dual(B) -> Preto
+
+Nesta saída existe a opção de marcar a visualização ou a não visualização
+de cada uma das partes do cálculo.
+
+
+Observações:
+
+A entrada é considerada sempre válida e que existe uma intersecção entre os polígonos,
+caso essa intersecção não exista, os cálculos serão realizados normalmente. Porém a Função
+não  D(F(D(A) U D(A))) mostrará um polígono convexo que não possuirá intersecção entre os
+dois polígonos.
+
+Caso os pontos sejam m

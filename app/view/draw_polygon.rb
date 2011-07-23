@@ -14,6 +14,7 @@ class DrawPolygon < Wx::Panel
     super(parent, -1)
     @points = points
     @not_show = []
+    @zoom = 0
     set_background_colour(Wx::WHITE)
     self.run_draw
   end
@@ -22,6 +23,10 @@ class DrawPolygon < Wx::Panel
     @width = dc.size.width/2
     @height = dc.size.height/2
     @center = Wx::Point.new(@width, @height)
+  end
+
+  def zoom=(zoom)
+    @zoom = zoom
   end
 
   # Determina quantos pixels o polígono deve
@@ -36,9 +41,9 @@ class DrawPolygon < Wx::Panel
     if bigger > half
       enlarge = 1
     else
-      enlarge = (min_between_h_w/bigger)
+      enlarge = (min_between_h_w/bigger.to_f)
     end
-    enlarge             
+    enlarge       
   end
 
   def draw_polygons(gdc)
@@ -46,7 +51,7 @@ class DrawPolygon < Wx::Panel
     @points.each_with_index do |polygon, index|
       unless @not_show.include? index
         pen_color(index, gdc)
-        p = Polygon2D.new(polygon, @center, eg)
+        p = Polygon2D.new(polygon, @center, @zoom, eg)
         gdc.draw_path(p.path(gdc))  
       end
     end
