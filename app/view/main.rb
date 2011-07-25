@@ -7,6 +7,7 @@ require "app/reader/file_reader"
 require "app/convex_hull/quick_hull"
 require "app/duality/duality"
 require "app/util/util"
+require "app/util/point_in_polygon"
 
 class IntersectionFrame < Wx::Frame
 
@@ -39,17 +40,19 @@ class IntersectionFrame < Wx::Frame
    
     union_dual = dual_a + dual_b
     union_dual = order_by_anti_clock_wise(union_dual)
-  
-    union_dual.each_with_index { |point, index| point << index }
 
-    fecho_convexo = QuickHull.new(union_dual).find
-    dual_fecho = Duality.new(fecho_convexo).duals_lines
-     
-    union_dual.each { |point| point.delete_at 2 }
+    union_dual_clone = clone_points_add_index(union_dual)
     
-     @polygon_panel = DrawPolygon.new(self, @points[1], @points[2],
+    fecho_convexo = QuickHull.new(union_dual_clone).find
+    dual_fecho = Duality.new(fecho_convexo).duals_lines
+    
+    @polygon_panel = DrawPolygon.new(self, @points[1], @points[2],
                                      dual_a, dual_b, union_dual,
                                      fecho_convexo, dual_fecho )
+
+    if ARGV[0].eql? "--show_points"
+      print_polygon_if_it_is_the_intersection(dual_fecho)
+    end
   end
 private
   def create_options
@@ -138,6 +141,21 @@ private
 
   def on_check_box(index)
     @polygon_panel.show_or_not(index)
+  end
+
+  def print_polygon_if_it_is_the_intersection(dual_fecho)
+    point_inside = PointInPolygon.new(@points[1])
+    # verifica se o polígono é realmente a intersecção
+    dual_fecho.each do |point|
+     return false unless point_inside.contains_point?(point)
+    end
+    print_polygon(dual_fecho)
+  end
+
+  def print_polygon(points)
+    points.each do |point|
+      puts "#{point[0]} #{point[1]}"  
+    end
   end
 end
 

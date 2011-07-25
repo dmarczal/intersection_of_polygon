@@ -7,7 +7,7 @@ class Duality
     @points = points
   end
 
-  # given two ponits this method
+  # given two points this method
   # returns the a b c of rect equation
   # equação da Reta 
   # = x(y1 – y2) + y(x2 – x1) + (x1y2 – x2y1)
@@ -68,9 +68,14 @@ class Duality
    
   #TODO: verificar operador ** 
   def dual_by_point(point)
-    x = - point[0] / (point[0].abs**2 + point[1].abs**2)
-    y = - point[1] / (point[0].abs**2 + point[1].abs**2)
-    
+    divisor = (point[0].abs**2 + point[1].abs**2)
+    if divisor != 0
+      x = - point[0] / divisor
+      y = - point[1] / divisor
+    else
+      x = 0.0
+      y = 0.0
+    end
     [x, y]
   end
 

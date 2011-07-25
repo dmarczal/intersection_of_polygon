@@ -37,9 +37,9 @@ private
   def scale(point)
     s = @scale + @zoom
     if s < 0
-      return point / s.to_f
+      return point / s.abs.to_f
     else
-      return point * s
+      return point * s.abs
     end
   end
 end

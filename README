@@ -3,47 +3,177 @@ Aluno: Diego Marczal
 Segundo Trabalho de Tópicos em Algoritmos - Tópicos em Geometria Computacional
 
 Intersecção de polígonos pelo uso de dualidade e fecho convexo
+  
+  Dado dois polígonos convexos, P com n vértices e Q com m vértices determinar
+a intersecção dos dois polígonos através da dualidade. Como os dois polígonos convexos,
+a interseção dele é outro polígono convexo.
 
-Problema: 
-Dado dois Polígonos Convexos, P com n vértices e Q com m vértices determinar 
-a intersecção dos dois polígonos. Como temos dois polígonos convexos, 
-a interseção do dos dois polígonos será outro polígono convexo.
+Para determinar a intersecção de polígonos convexos utiliza-se o teorema visto na disciplina:
 
-Para Determinar a intersecção dos polígonos o teorema visto na disciplina.
-Seja A e B dois polígonos, então:
+Seja A e B dois polígonos, então: A ∩ B = D(F(D(A) U D(A)))
 
-A ∩ B = D(F(D(A) U D(A)))
-
-Onde D() é a função que calcula o Dual de um polígono e
-F é a função que calcula o fecho convexo de uma conjunto de pontos
+Onde D é a função que calcula o Dual de um polígono e
+F é a função que calcula o fecho convexo de uma conjunto de pontos.
 
 Entrada:
 
-Um arquivo sendo a primeira linha é formada pelo número de vértices do primeiro polígono.
-Depois temos as coordenadas (inteiras) dos vértices do primeiro polígono. Em seguida o número
-de vértices do segundo polígono e depois as coordenadas dos vértices. 
-Em cada polígono os vértices estão em ordem anti-horária.
+A entrada do algoritmo é um arquivo sendo a primeira linha é formada pelo 
+número de vértices do primeiro polígono, após as coordenadas (inteiras) 
+dos vértices do primeiro polígono. Em seguida o número de vértices do segundo polígono
+e depois as coordenadas dos vértices. Em cada polígono os vértices estão em ordem anti-horária.
 
 Saída:
 
-A saída do algoritmo é visual onde apresenta-se separados por cores
-Polígono A -> Vermelho
-Polígono B -> Azul
-Dual de A  -> Marrom
-Dual de B  -> Azul escuro
-Dual(A) U Dual(B) -> Verde
-Fecho Convexo do Dual(A) U Dual(B) -> Cinza
-Dual do Fecho Convexo de Dual(A) U Dual(B) -> Preto
+A saída do algoritmo é visual, onde apresenta-se uma janela contendo todos os polígonos utilizados
+para cálculos estão indicados por cores, sendo elas:
 
-Nesta saída existe a opção de marcar a visualização ou a não visualização
-de cada uma das partes do cálculo.
+Polígono A                                 -> Vermelho
+Polígono B                                 -> Azul
+Dual(A)                                    -> Marrom
+Dual(B)                                    -> Azul escuro
+Dual(A) U Dual(B)                          -> Verde
+Fecho Convexo do Dual(A) U Dual(B)         -> Cinza
+Dual do Fecho Convexo do Dual(A) U Dual(B) -> Preto
+
+Na Janela ainda existe uma área com as opções de esconder e mostrar as visualização dos polígonos
+citados anteriormente.
+
+Além disso, existe a opção de zoom in e zoom out através de um slider dentro do intervalo de -100
+a 100. O zoom também está acompanhado da escala do zoom, o que é útil para visualização dos polígonos 
+com medidas muito pequenas, ou ainda medidas muito altas.
+
+Existe uma opção de saída padrão dos pontos de intersecção do polígonos descrito no item execução.
+
+Observações importantes:
+
+- A entrada é considerada sempre válida 
+- É considerado que existe uma intersecção entre os polígonos de entrada
+  - Se entrada for dois polígonos sem intersecção será realizados os cálculos
+    e será mostrado todos os polígonos acima, inclusive o polígono D(F(D(A) U D(A))),
+    mesmo que ele não seja a intersecção neste caso.
+  
+  - No caso de não mostrar a intersecção dos polígonos, seria necessário verificar se
+    os pontos do retorno D(F(D(A) U D(A))).
+    a) são colineares ao as retas de um dos polígonos
+    b) quando colineares cada ponto deve estar entre os pontos que formam a equação da reta,
+       ou seja devem estar dentro da reta do polígono.
+    c) Quando não colineares deve verificar se o ponto está dentro do polígono.
+    Se cada ponto do retorno satisfazer as condições acima então é uma intersecção
+
+  - As opções acima formam implementadas para saída da intersecção na saída padrão. Caso exista intersecção
+  os pontos são impressos, caso não, nada será impresso.
+
+- É considerado que o ponto central da intersecção dos polígono é o Ponto P(0,0)
 
 
-Observações:
+Execução:
 
-A entrada é considerada sempre válida e que existe uma intersecção entre os polígonos,
-caso essa intersecção não exista, os cálculos serão realizados normalmente. Porém a Função
-não  D(F(D(A) U D(A))) mostrará um polígono convexo que não possuirá intersecção entre os
-dois polígonos.
+O trabalho foi desenvolvido em ruby.
+Para funcionar no DINF tive que fazer algumas alterações nas configurações.
+Testei na minha Home e funcionou OK. Porém, somente funcionou na versão do ruby 1.8.7, que está instalado
+na na minha home. Devido a conflitos com as configurações do debian a interface gráfica não funcionou no DINF com o ruby
+1.9.2. Por isso, dependendo do polígono a execução pode ficar bem lenta, devido a diferença de desempenho do ruby 1.8.7
 
-Caso os pontos sejam m
+Com as configurações que estão no arquivo interpoly ele apenas funcionará nas máquinas do DINF, porém para funcionar
+em outras máquinas é necessário instalar as dependências abaixo e mudar a seguinte linha do interpoly
+
+De: #!/usr/bin/env /home/ppginf/diego/.rvm/rubies/ruby-1.8.7-p334/bin/ruby
+Para: #!/usr/bin/env ruby
+e comentar a linha
+$:.unshift(*Dir[File.dirname(__FILE__) + "/vendor/gems/**/lib"])
+
+Dependências
+ gem wxRuby responsável pela construção da interface.
+ gem rubygems
+
+Para executar utilize o seguinte comando
+./interpoly < arquivo_com_os_polígonos  -> saída visual
+./interpoly < arquivo_com_os_polígonos  -> saída visual e saída padrão caso a intersecção exista
+
+O comando make apenas atribui permissão de execução ao arquivo interpoly
+
+Descrição do algoritmo e dos principais conceitos
+
+Fecho Convexo:
+
+Um fecho convexo é definido como o menor polígono convexo, polígono simples com todos o
+s vértices formando ângulos internos menores que 180 graus, que contém todos os pontos 
+do conjunto [1, 2].
+
+Existe diversos algoritmos para determinar o fecho convexo de um conjunto de pontos. Neste 
+trabalho foi usado o algoritmo Quick Hull, sendo o mesmo utilizado no trabalho anterior. O
+Quick Hull é similar ao lagoritmo quicksort, tendo com ideia básica que é mais fácil descartar
+muitos pontos que estão no interior do fecho, e concentrar o trabalho nos pontos mais próximos
+da fronteira. O Quickhull possui diversas formas de implementações mas todas elas seguem a 
+ideia básica do algoritmo.
+
+Nesta versão o Quick hull funciona da seguinte forma.
+
+1. Entrada de um conjunto de pontos S
+2. Os pontos de S são ordenados de acordo com o eixo x
+3. Seleciona P1 sendo primeiro ponto e P2 o último ponto de S
+  3.1 Cria-se um segmento de P1 para P2 com o conjunto de pontos
+  3.2 Chama-se o algoritmo quick hull para o segmento P1->P2
+  3.3 Cria-se um segmento de P2 para P1 com o conjunto de pontos
+  3.4 Chama-se o algoritmo quick hull para o segmento P2->P1
+
+4. Quick Hull
+  4.1 Seleciona o ponto mais distante da reta, através da fórmula da distância de um ponto
+      a uma reta, sendo esse calculo otimizado pela não execução da divisão da formula.
+
+  4.2 Seleciona o conjunto de pontos acima da reta, para isso, calcula-se a distancia dos pontos a
+      reta e verifica se a distância é maior que 0, caso seja, então está acima da reta. Para essa
+      comparação é utilizado uma precisão de de 6 casas após a virgula. Tendo em vista que podem 
+      ser usado números em ponto flutuante.
+
+  4.2 Enquanto existir um ponto mais distante que seja maior que zero (d > 0)
+     4.2.1 Seleciona P1 sendo ponto mais distante da reta e P2 o ponto B do segmento anterior
+           e P3 o pont A do segmento anterior.
+     4.2.2 Cria-se um segmento de P1 para P2 com o conjunto de pontos acima da reta
+     4.2.3 Chama-se o algoritmo quick hull para o segmento P1 -> P2
+     4.2.4 Cria-se um segmento de P2 para P1 com o conjunto de pontos acima da reta
+     4.2.5 Chama-se o algoritmo quick hull para o segmento P3 -> P1
+  
+  4.3 A final da execução do Quick hull, teremos dois conjuntos de pontos que juntos formam 
+      o fecho convexo. O que algoritmo faz então e juntar esses pontos para formarem um conjunto
+      de pontos do fecho convexo. Mas antes de juntar os pontos o algoritmo remove os pontos
+      colineares dos extremos dos conjuntos. Para não existir repetição de pontos.
+
+Dual de um polígono
+
+Em geometria cada ponto está relacionado a uma reta e cada reta está relacionada a um ponto, os
+quais são chamados de duais. Ou seja, um ponto no plano primal representa uma reta no plano dual e uma
+reta no plano primal é um ponto no plano dual e vice-versa. Sendo assim, têm-se que o dual do dual
+é o original.
+
+Existem várias tipos de duais sobre a relação ponto-reta e reta-ponto. Mas para calcular a intersecção de 
+polígonos usamos o dual da reta para o ponto. Cada reta do polígono no plano primal gera um ponto no plano
+dual, sendo assim o conjunto de pontos no plano dual forma um novo polígono.
+
+O calculo do dual é feito da seguinte forma.
+1. Dado dois pontos do polígono no plano primal calcula-se a equação da reta R1 que contem os dois pontos
+2. Determina-se a reta R2 perpendicular a Reta R1 que passa pelo ponto P(0,0)
+3. Determina-se o ponto PI de intersecção de R1 e R2.
+4. O ponto dual está a distância de 1/distância do Ponto PI ao ponto P(0,0) no quadrante inverso.
+  4.1 Para calcular o ponto dual
+     Utiliza-se a formula da distância com simplificações de modo que o ponto dual é determinado
+     pela equação x = -PI.x / (PI.x^2 + PI.y^2) y = -PI.y / (PI.x^2 + PI.y^2), assim P_DUAl(x, y)
+     (Mais detalhes no comentário da classe Duality)
+
+Para calcular o Dual do polígono repete-se o passo do 1 ao 4 para cada reta do polígono, assim a a partir do polígono
+no plano primal têm-se o polígono no plano Dual.
+
+Tendo a função do fecho e do dual para encontrar a interseção basta fazer o  D(F(D(A) U D(A)))
+
+Referências
+
+[1] http://www.ime.usp.br/~freitas/gc/java/GrahamApp.html
+
+[2] Introdução a Geometria Computacional. Luiz Henrique de Figueiredo e 
+Paulo César Pinta Carvalho
+
+[3] http://pt.wikipedia.org/wiki/Poliedro_dual
+
+[4] Computacional Geometry in C. Joseph O'Rourke
+
+[5] http://jakescruggs.blogspot.com/2009/07/point-inside-polygon-in-ruby.html

@@ -5,5 +5,3 @@ require "app/view/main"
 require "app/duality/duality"
 
 Main.new.main_loop
-
-

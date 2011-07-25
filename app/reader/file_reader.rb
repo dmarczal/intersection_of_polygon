@@ -8,21 +8,18 @@ module FileReader
     polygon_a = []
     polygon_b = []
     begin
-      count = 0
-      size = $stdin.readline.to_i
+      size = $stdin.readline.to_f
       (1..size).each do |i|
         line = $stdin.readline
-        x, y = line.split.map {|x| x.to_i}
-        polygon_a << [x,y] #, count]
-        count += 1
+        x, y = line.split.map {|x| x.to_f}
+        polygon_a << [x,y]
       end
 
-      size = $stdin.readline.to_i
+      size = $stdin.readline.to_f
       (1..size).each do |i|
         line = $stdin.readline
-        x, y = line.split.map {|x| x.to_i}
-        polygon_b << [x,y]#, count]
-        #count+=1
+        x, y = line.split.map {|x| x.to_f}
+        polygon_b << [x,y]
       end
     rescue EOFError
     end
